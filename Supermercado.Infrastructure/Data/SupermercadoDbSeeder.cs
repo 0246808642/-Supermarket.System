@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.Identity;
+using Supermercado.Application.Common;
 using Supermercado.Domain.Entities;
 using Supermercado.Domain.ValueObjects;
+using Supermercado.Infrastructure.Identity;
 
 namespace Supermercado.Infrastructure.Data;
 
@@ -43,7 +46,7 @@ public static class SupermercadoDbSeeder
                 var money = new Money(preco);
                 var validade = currentDate.AddDays(diasValidade);
                 
-                var produto = new Product(nome, desc, barcode, money, catId, validade, 40m, currentDate);
+                var produto = new Product(nome, desc, barcode, money, catId, validade, 40m, currentDate, Guid.Parse("00000000-0000-0000-0000-000000000001"), currentDate);
                 produto.AddStock(estoque);
                 return produto;
             }
@@ -121,5 +124,57 @@ public static class SupermercadoDbSeeder
             await context.Products.AddRangeAsync(products);
             await context.SaveChangesAsync();
         }
+    }
+
+    public static async Task SeedIdentityAsync(
+        UserManager<ApplicationUser> userManager,
+        RoleManager<ApplicationRole> roleManager)
+    {
+        string[] roles = { Roles.Cliente, Roles.Funcionario, Roles.Chefe };
+
+        foreach (var roleName in roles)
+        {
+            if (!await roleManager.RoleExistsAsync(roleName))
+                await roleManager.CreateAsync(new ApplicationRole(roleName));
+        }
+
+        await CreateUserIfNotExists(userManager,
+            id: Guid.Parse("00000000-0000-0000-0000-000000000001"),
+            email: "sistema@supermercado.local",
+            password: "SenhaForteSistema#2026",
+            role: Roles.Chefe,
+            fullName: "Usuário Sistema (auditoria legada)");
+
+        await CreateUserIfNotExists(userManager,
+            email: "cliente@teste.com", password: "Cliente#123", role: Roles.Cliente, fullName: "Cliente Teste");
+
+        await CreateUserIfNotExists(userManager,
+            email: "funcionario@teste.com", password: "Funcionario#123", role: Roles.Funcionario, fullName: "Funcionário Teste");
+
+        await CreateUserIfNotExists(userManager,
+            email: "chefe@teste.com", password: "Chefe#123", role: Roles.Chefe, fullName: "Chefe Teste");
+    }
+
+    private static async Task CreateUserIfNotExists(
+        UserManager<ApplicationUser> userManager,
+        string email, string password, string role, string fullName, Guid? id = null)
+    {
+        if (await userManager.FindByEmailAsync(email) is not null)
+            return;
+
+        var user = new ApplicationUser
+        {
+            Id = id ?? Guid.NewGuid(),
+            UserName = email,
+            Email = email,
+            FullName = fullName,
+            EmailConfirmed = true
+        };
+
+        var result = await userManager.CreateAsync(user, password);
+        if (!result.Succeeded)
+            throw new InvalidOperationException(string.Join("; ", result.Errors.Select(e => e.Description)));
+
+        await userManager.AddToRoleAsync(user, role);
     }
 }

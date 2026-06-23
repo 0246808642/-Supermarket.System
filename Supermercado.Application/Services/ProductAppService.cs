@@ -1,3 +1,4 @@
+using Supermercado.Application.Common;
 using Supermercado.Application.DTOs.Product;
 using Supermercado.Application.Interfaces;
 using Supermercado.Domain.Entities;
@@ -10,23 +11,25 @@ public class ProductAppService : IProductAppService
 {
     private readonly IProductRepository _productRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICurrentUserService _currentUser;
 
-    public ProductAppService(IProductRepository productRepository, IUnitOfWork unitOfWork)
+    public ProductAppService(IProductRepository productRepository, IUnitOfWork unitOfWork, ICurrentUserService currentUser)
     {
         _productRepository = productRepository;
         _unitOfWork = unitOfWork;
+        _currentUser = currentUser;
     }
 
-    public async Task<ProductOutputDto> RegisterProductAsync(RegisterProductInputDto input)
+    public async Task<Guid> RegisterProductAsync(RegisterProductInputDto input)
     {
-        var currentDate = DateTime.UtcNow;
+        if (_currentUser.UserId is null)
+            throw new UnauthorizedAccessException("Usuário não autenticado.");
 
-        // Orchestration: Instantiating Value Objects using rigid primitives
+        var currentDate = DateTime.UtcNow;
         var barcode = new Barcode(input.Barcode);
         var price = new Money(input.Price);
 
-        // Business rules and invariants are protected by the Product entity
-        var product = new Product(input.Name, input.Description, barcode, price, input.CategoryId, input.ExpirationDate, input.ExpirationDiscountPercentage, currentDate);
+        var product = new Product(input.Name, input.Description, barcode, price, input.CategoryId, input.ExpirationDate, input.ExpirationDiscountPercentage, currentDate, _currentUser.UserId.Value, currentDate);
 
         _productRepository.Add(product);
         
@@ -35,7 +38,7 @@ public class ProductAppService : IProductAppService
         if (!success)
             throw new Exception("Houve um erro ao salvar o produto.");
 
-        return MapToOutput(product, currentDate);
+        return product.Id;
     }
 
     public async Task UpdateProductPriceAsync(Guid id, UpdateProductPriceInputDto input)
@@ -46,8 +49,6 @@ public class ProductAppService : IProductAppService
             throw new Exception("Produto não encontrado.");
 
         var newPrice = new Money(input.NewPrice);
-
-        // The entity handles the domain logic for price updates
         product.UpdatePrice(newPrice);
 
         _productRepository.Update(product);
@@ -58,7 +59,7 @@ public class ProductAppService : IProductAppService
             throw new Exception("Houve um erro ao atualizar o preço do produto.");
     }
 
-    public async Task<ProductOutputDto?> GetProductByIdAsync(Guid id)
+    public async Task<object?> GetProductByIdAsync(Guid id)
     {
         var product = await _productRepository.GetByIdAsync(id);
 
@@ -66,34 +67,56 @@ public class ProductAppService : IProductAppService
             return null;
 
         var currentDate = DateTime.UtcNow;
-        return MapToOutput(product, currentDate);
+        return _currentUser.Role switch
+        {
+            Roles.Chefe => MapToAuditDto(product, currentDate),
+            Roles.Funcionario => MapToDetailedDto(product, currentDate),
+            _ => MapToBaseDto(product, currentDate)
+        };
     }
 
-    public async Task<IEnumerable<ProductOutputDto>> GetAllProductsAsync()
+    public async Task<IEnumerable<object>> GetAllProductsAsync()
     {
         var products = await _productRepository.GetAllAsync();
-
         var currentDate = DateTime.UtcNow;
-        return products.Select(p => MapToOutput(p, currentDate));
+
+        return _currentUser.Role switch
+        {
+            Roles.Chefe => products.Select(p => MapToAuditDto(p, currentDate)),
+            Roles.Funcionario => products.Select(p => MapToDetailedDto(p, currentDate)),
+            _ => products.Select(p => MapToBaseDto(p, currentDate))
+        };
     }
 
-    // Simple manual mapper for demonstration. In a real scenario, AutoMapper could be used.
-    private static ProductOutputDto MapToOutput(Product product, DateTime currentDate)
+    public async Task RemoveProductAsync(Guid id)
     {
-        return new ProductOutputDto(
-            product.Id,
-            product.Name,
-            product.Description,
-            product.Barcode.Code,
-            product.Price.Value,
-            product.StockQuantity,
-            product.IsActive,
-            product.CategoryId,
-            product.ExpirationDate,
-            product.ExpirationDiscountPercentage,
-            product.IsAvailableForSale(currentDate),
-            product.GetCurrentPrice(currentDate).Value,
-            product.GetDiscountedPrice().Value
-        );
+        if (_currentUser.UserId is null)
+            throw new UnauthorizedAccessException("Usuário não autenticado.");
+
+        var product = await _productRepository.GetByIdAsync(id);
+        if (product is null)
+            throw new Exception("Produto não encontrado.");
+
+        product.Remove(_currentUser.UserId.Value, DateTime.UtcNow);
+        
+        _productRepository.Update(product);
+        var success = await _unitOfWork.CommitAsync();
+        
+        if (!success)
+            throw new Exception("Houve um erro ao remover o produto.");
     }
+
+    private static ProductOutputDto MapToBaseDto(Product p, DateTime now) =>
+        new(p.Id, p.Name, p.GetCurrentPrice(now).Value, p.IsAvailableForSale(now));
+
+    private static ProductOutputDetailedDto MapToDetailedDto(Product p, DateTime now) =>
+        new(p.Id, p.Name, p.GetCurrentPrice(now).Value, p.IsAvailableForSale(now),
+            p.Description, p.Barcode.Code, p.Price.Value, p.StockQuantity,
+            p.IsActive, p.CategoryId, p.ExpirationDate, p.ExpirationDiscountPercentage);
+
+    private static ProductOutputAuditDto MapToAuditDto(Product p, DateTime now) =>
+        new(p.Id, p.Name, p.GetCurrentPrice(now).Value, p.IsAvailableForSale(now),
+            p.Description, p.Barcode.Code, p.Price.Value, p.StockQuantity,
+            p.IsActive, p.CategoryId, p.ExpirationDate, p.ExpirationDiscountPercentage,
+            p.CreatedByUserId, p.CreatedAt, p.RemovedByUserId, p.RemovedAt, p.IsRemoved);
 }

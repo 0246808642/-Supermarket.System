@@ -18,10 +18,16 @@ public class Product : Entity, IAggregateRoot
     public Guid CategoryId { get; private set; }
     public Category Category { get; private set; }
 
+    public Guid CreatedByUserId { get; private set; }
+    public DateTime CreatedAt { get; private set; }
+    public Guid? RemovedByUserId { get; private set; }
+    public DateTime? RemovedAt { get; private set; }
+    public bool IsRemoved { get; private set; }
+
     // Protected constructor for EF Core
     protected Product() { }
 
-    public Product(string name, string description, Barcode barcode, Money price, Guid categoryId, DateTime expirationDate, decimal expirationDiscountPercentage, DateTime currentDate)
+    public Product(string name, string description, Barcode barcode, Money price, Guid categoryId, DateTime expirationDate, decimal expirationDiscountPercentage, DateTime currentDate, Guid createdByUserId, DateTime createdAt)
     {
         Validate(name, description);
         if ((expirationDate - currentDate).TotalDays < 5)
@@ -38,6 +44,8 @@ public class Product : Entity, IAggregateRoot
         CategoryId = categoryId;
         ExpirationDate = expirationDate;
         ExpirationDiscountPercentage = expirationDiscountPercentage;
+        CreatedByUserId = createdByUserId;
+        CreatedAt = createdAt;
     }
 
     public void UpdateDetails(string name, string description, Guid categoryId)
@@ -107,8 +115,19 @@ public class Product : Entity, IAggregateRoot
 
     public bool IsAvailableForSale(DateTime currentDate)
     {
+        if (IsRemoved) return false;
         if (currentDate > ExpirationDate) return false;
         return StockQuantity > 0;
+    }
+
+    public void Remove(Guid removedByUserId, DateTime removedAt)
+    {
+        if (IsRemoved)
+            throw new DomainException("Produto já foi removido.");
+
+        IsRemoved = true;
+        RemovedByUserId = removedByUserId;
+        RemovedAt = removedAt;
     }
 
     private void Validate(string name, string description)

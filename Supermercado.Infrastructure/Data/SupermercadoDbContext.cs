@@ -1,20 +1,23 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Supermercado.Domain.Entities;
+using Supermercado.Infrastructure.Identity;
 using System.Reflection;
 
 namespace Supermercado.Infrastructure.Data;
 
-public class SupermercadoDbContext : DbContext
+public class SupermercadoDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
 {
     public SupermercadoDbContext(DbContextOptions<SupermercadoDbContext> options) : base(options) { }
 
-    public DbSet<Product> Products { get; set; }
-    public DbSet<Category> Categories { get; set; }
+    public DbSet<Product> Products => Set<Product>();
+    public DbSet<Category> Categories => Set<Category>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-        
         base.OnModelCreating(modelBuilder);
+        
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }

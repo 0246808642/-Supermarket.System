@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Supermercado.Application.DTOs.Product;
 using Supermercado.Application.Interfaces;
+using Supermercado.Application.Common;
 
 namespace Supermercado.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class ProductsController : ControllerBase
@@ -33,12 +36,13 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = $"{Roles.Funcionario},{Roles.Chefe}")]
     public async Task<IActionResult> Register([FromBody] RegisterProductInputDto input)
     {
         try
         {
-            var product = await _productAppService.RegisterProductAsync(input);
-            return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
+            var productId = await _productAppService.RegisterProductAsync(input);
+            return CreatedAtAction(nameof(GetById), new { id = productId }, new { id = productId });
         }
         catch (Exception ex)
         {
@@ -47,11 +51,27 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/price")]
+    [Authorize(Roles = $"{Roles.Funcionario},{Roles.Chefe}")]
     public async Task<IActionResult> UpdatePrice(Guid id, [FromBody] UpdateProductPriceInputDto input)
     {
         try
         {
             await _productAppService.UpdateProductPriceAsync(id, input);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { Message = ex.Message });
+        }
+    }
+
+    [HttpDelete("{id:guid}")]
+    [Authorize(Roles = Roles.Chefe)]
+    public async Task<IActionResult> Remove(Guid id)
+    {
+        try
+        {
+            await _productAppService.RemoveProductAsync(id);
             return NoContent();
         }
         catch (Exception ex)

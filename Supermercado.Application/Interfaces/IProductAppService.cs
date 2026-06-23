@@ -4,8 +4,9 @@ namespace Supermercado.Application.Interfaces;
 
 public interface IProductAppService
 {
-    Task<ProductOutputDto> RegisterProductAsync(RegisterProductInputDto input);
+    Task<Guid> RegisterProductAsync(RegisterProductInputDto input);
     Task UpdateProductPriceAsync(Guid id, UpdateProductPriceInputDto input);
-    Task<ProductOutputDto?> GetProductByIdAsync(Guid id);
-    Task<IEnumerable<ProductOutputDto>> GetAllProductsAsync();
+    Task<object?> GetProductByIdAsync(Guid id);
+    Task<IEnumerable<object>> GetAllProductsAsync();
+    Task RemoveProductAsync(Guid id);
 }

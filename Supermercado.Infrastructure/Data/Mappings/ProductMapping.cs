@@ -33,6 +33,19 @@ public class ProductMapping : IEntityTypeConfiguration<Product>
             .HasColumnType("decimal(5,2)")
             .IsRequired();
 
+        builder.Property(p => p.CreatedByUserId)
+            .IsRequired();
+
+        builder.Property(p => p.CreatedAt)
+            .IsRequired();
+
+        builder.Property(p => p.RemovedByUserId);
+
+        builder.Property(p => p.RemovedAt);
+
+        builder.Property(p => p.IsRemoved)
+            .IsRequired();
+
         builder.OwnsOne(p => p.Barcode, cb =>
         {
             cb.Property(c => c.Code)
