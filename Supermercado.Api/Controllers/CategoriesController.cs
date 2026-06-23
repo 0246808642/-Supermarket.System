@@ -45,4 +45,18 @@ public class CategoriesController : ControllerBase
             return BadRequest(new { Message = ex.Message });
         }
     }
+
+    [HttpPatch("{id:guid}")]
+    public async Task<IActionResult> UpdateCategory(Guid id, [FromBody] UpdateCategoryInputDto input)
+    {
+        try
+        {
+            await _categoryAppService.UpdateCategoryAsync(id, input);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { Message = ex.Message });
+        }
+    }
 }

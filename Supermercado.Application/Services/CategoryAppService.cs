@@ -30,6 +30,23 @@ public class CategoryAppService : ICategoryAppService
         return MapToOutput(category);
     }
 
+    public async Task UpdateCategoryAsync(Guid id, UpdateCategoryInputDto input)
+    {
+        var category = await _categoryRepository.GetByIdAsync(id);
+        
+        if (category is null)
+            throw new Exception("Categoria não encontrada.");
+
+        category.UpdateDetails(input.Name, input.Description);
+
+        await _categoryRepository.UpdateAsync(category);
+        
+        var success = await _unitOfWork.CommitAsync();
+        
+        if (!success)
+            throw new Exception("Houve um erro ao atualizar a categoria.");
+    }
+
     public async Task<CategoryOutputDto?> GetCategoryByIdAsync(Guid id)
     {
         var category = await _categoryRepository.GetByIdAsync(id);
