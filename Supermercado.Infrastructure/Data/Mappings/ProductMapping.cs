@@ -26,6 +26,13 @@ public class ProductMapping : IEntityTypeConfiguration<Product>
         builder.Property(p => p.IsActive)
             .IsRequired();
 
+        builder.Property(p => p.ExpirationDate)
+            .IsRequired();
+
+        builder.Property(p => p.ExpirationDiscountPercentage)
+            .HasColumnType("decimal(5,2)")
+            .IsRequired();
+
         builder.OwnsOne(p => p.Barcode, cb =>
         {
             cb.Property(c => c.Code)

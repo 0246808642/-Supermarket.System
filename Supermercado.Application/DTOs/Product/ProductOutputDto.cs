@@ -8,5 +8,9 @@ public record ProductOutputDto(
     decimal Price,
     int StockQuantity,
     bool IsActive,
-    Guid CategoryId
+    Guid CategoryId,
+    DateTime ExpirationDate,
+    decimal ExpirationDiscountPercentage,
+    bool IsAvailable,
+    decimal CurrentPrice
 );

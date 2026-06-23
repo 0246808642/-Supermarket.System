@@ -5,5 +5,7 @@ public record RegisterProductInputDto(
     string Description,
     string Barcode,
     decimal Price,
-    Guid CategoryId
+    Guid CategoryId,
+    DateTime ExpirationDate,
+    decimal ExpirationDiscountPercentage
 );

@@ -19,12 +19,14 @@ public class ProductAppService : IProductAppService
 
     public async Task<ProductOutputDto> RegisterProductAsync(RegisterProductInputDto input)
     {
+        var currentDate = DateTime.UtcNow;
+
         // Orchestration: Instantiating Value Objects using rigid primitives
         var barcode = new Barcode(input.Barcode);
         var price = new Money(input.Price);
 
         // Business rules and invariants are protected by the Product entity
-        var product = new Product(input.Name, input.Description, barcode, price, input.CategoryId);
+        var product = new Product(input.Name, input.Description, barcode, price, input.CategoryId, input.ExpirationDate, input.ExpirationDiscountPercentage, currentDate);
 
         _productRepository.Add(product);
         
@@ -33,7 +35,7 @@ public class ProductAppService : IProductAppService
         if (!success)
             throw new Exception("Houve um erro ao salvar o produto.");
 
-        return MapToOutput(product);
+        return MapToOutput(product, currentDate);
     }
 
     public async Task UpdateProductPriceAsync(Guid id, UpdateProductPriceInputDto input)
@@ -63,18 +65,20 @@ public class ProductAppService : IProductAppService
         if (product is null)
             return null;
 
-        return MapToOutput(product);
+        var currentDate = DateTime.UtcNow;
+        return MapToOutput(product, currentDate);
     }
 
     public async Task<IEnumerable<ProductOutputDto>> GetAllProductsAsync()
     {
         var products = await _productRepository.GetAllAsync();
 
-        return products.Select(MapToOutput);
+        var currentDate = DateTime.UtcNow;
+        return products.Select(p => MapToOutput(p, currentDate));
     }
 
     // Simple manual mapper for demonstration. In a real scenario, AutoMapper could be used.
-    private static ProductOutputDto MapToOutput(Product product)
+    private static ProductOutputDto MapToOutput(Product product, DateTime currentDate)
     {
         return new ProductOutputDto(
             product.Id,
@@ -84,7 +88,11 @@ public class ProductAppService : IProductAppService
             product.Price.Value,
             product.StockQuantity,
             product.IsActive,
-            product.CategoryId
+            product.CategoryId,
+            product.ExpirationDate,
+            product.ExpirationDiscountPercentage,
+            product.IsAvailableForSale(currentDate),
+            product.GetCurrentPrice(currentDate).Value
         );
     }
 }

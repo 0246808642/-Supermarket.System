@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Supermercado.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using Supermercado.Infrastructure.Data;
 namespace Supermercado.Infrastructure.Migrations
 {
     [DbContext(typeof(SupermercadoDbContext))]
-    partial class SupermercadoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260623172720_AddProductExpirationAndDiscount")]
+    partial class AddProductExpirationAndDiscount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
