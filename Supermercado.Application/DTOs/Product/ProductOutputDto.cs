@@ -7,5 +7,6 @@ public record ProductOutputDto(
     string Barcode,
     decimal Price,
     int StockQuantity,
-    bool IsActive
+    bool IsActive,
+    Guid CategoryId
 );

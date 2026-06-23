@@ -11,11 +11,14 @@ public class Product : Entity, IAggregateRoot
     public Money Price { get; private set; }
     public int StockQuantity { get; private set; }
     public bool IsActive { get; private set; }
+    
+    public Guid CategoryId { get; private set; }
+    public Category Category { get; private set; }
 
     // Protected constructor for EF Core
     protected Product() { }
 
-    public Product(string name, string description, Barcode barcode, Money price)
+    public Product(string name, string description, Barcode barcode, Money price, Guid categoryId)
     {
         Validate(name, description);
 
@@ -25,13 +28,15 @@ public class Product : Entity, IAggregateRoot
         Price = price;
         StockQuantity = 0;
         IsActive = true;
+        CategoryId = categoryId;
     }
 
-    public void UpdateDetails(string name, string description)
+    public void UpdateDetails(string name, string description, Guid categoryId)
     {
         Validate(name, description);
         Name = name;
         Description = description;
+        CategoryId = categoryId;
     }
 
     public void UpdatePrice(Money newPrice)

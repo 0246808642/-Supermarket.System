@@ -13,9 +13,11 @@ public static class NativeInjectorBootStrapper
     {
         // Application Layer
         services.AddScoped<IProductAppService, ProductAppService>();
+        services.AddScoped<ICategoryAppService, CategoryAppService>();
 
         // Infrastructure Layer
         services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 }

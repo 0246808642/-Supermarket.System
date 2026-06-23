@@ -4,5 +4,6 @@ public record RegisterProductInputDto(
     string Name,
     string Description,
     string Barcode,
-    decimal Price
+    decimal Price,
+    Guid CategoryId
 );

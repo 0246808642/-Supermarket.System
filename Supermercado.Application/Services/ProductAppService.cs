@@ -24,7 +24,7 @@ public class ProductAppService : IProductAppService
         var price = new Money(input.Price);
 
         // Business rules and invariants are protected by the Product entity
-        var product = new Product(input.Name, input.Description, barcode, price);
+        var product = new Product(input.Name, input.Description, barcode, price, input.CategoryId);
 
         _productRepository.Add(product);
         
@@ -83,7 +83,8 @@ public class ProductAppService : IProductAppService
             product.Barcode.Code,
             product.Price.Value,
             product.StockQuantity,
-            product.IsActive
+            product.IsActive,
+            product.CategoryId
         );
     }
 }

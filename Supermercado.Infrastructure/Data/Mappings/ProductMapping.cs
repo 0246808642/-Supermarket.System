@@ -41,5 +41,9 @@ public class ProductMapping : IEntityTypeConfiguration<Product>
                 .HasColumnType("decimal(18,2)")
                 .IsRequired();
         });
+
+        builder.HasOne(p => p.Category)
+            .WithMany(c => c.Products)
+            .HasForeignKey(p => p.CategoryId);
     }
 }
