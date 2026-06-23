@@ -22,6 +22,13 @@ builder.Services.RegisterServices();
 
 var app = builder.Build();
 
+// Execute Database Seeder
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<SupermercadoDbContext>();
+    await SupermercadoDbSeeder.SeedAsync(dbContext);
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
