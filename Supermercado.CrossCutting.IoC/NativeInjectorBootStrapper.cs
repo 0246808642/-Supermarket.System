@@ -1,0 +1,21 @@
+using Microsoft.Extensions.DependencyInjection;
+using Supermercado.Application.Interfaces;
+using Supermercado.Application.Services;
+using Supermercado.Domain.Interfaces;
+using Supermercado.Infrastructure.Data;
+using Supermercado.Infrastructure.Repositories;
+
+namespace Supermercado.CrossCutting.IoC;
+
+public static class NativeInjectorBootStrapper
+{
+    public static void RegisterServices(this IServiceCollection services)
+    {
+        // Application Layer
+        services.AddScoped<IProductAppService, ProductAppService>();
+
+        // Infrastructure Layer
+        services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+    }
+}

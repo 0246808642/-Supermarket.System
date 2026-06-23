@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Supermercado.Api/Supermercado.Api.csproj" />
+  <Project Path="Supermercado.Application/Supermercado.Application.csproj" />
+  <Project Path="Supermercado.CrossCutting.IoC/Supermercado.CrossCutting.IoC.csproj" />
+  <Project Path="Supermercado.Domain/Supermercado.Domain.csproj" />
+  <Project Path="Supermercado.Infrastructure/Supermercado.Infrastructure.csproj" />
+</Solution>
