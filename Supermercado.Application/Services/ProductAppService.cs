@@ -92,7 +92,8 @@ public class ProductAppService : IProductAppService
             product.ExpirationDate,
             product.ExpirationDiscountPercentage,
             product.IsAvailableForSale(currentDate),
-            product.GetCurrentPrice(currentDate).Value
+            product.GetCurrentPrice(currentDate).Value,
+            product.GetDiscountedPrice().Value
         );
     }
 }

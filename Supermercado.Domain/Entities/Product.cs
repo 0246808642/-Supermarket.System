@@ -89,13 +89,18 @@ public class Product : Entity, IAggregateRoot
         ExpirationDiscountPercentage = percentage;
     }
 
+    public Money GetDiscountedPrice()
+    {
+        var discount = Price.Value * (ExpirationDiscountPercentage / 100m);
+        return new Money(Price.Value - discount);
+    }
+
     public Money GetCurrentPrice(DateTime currentDate)
     {
         var daysToExpiration = (ExpirationDate - currentDate).TotalDays;
         if (daysToExpiration >= 0 && daysToExpiration <= 10)
         {
-            var discount = Price.Value * (ExpirationDiscountPercentage / 100m);
-            return new Money(Price.Value - discount);
+            return GetDiscountedPrice();
         }
         return Price;
     }

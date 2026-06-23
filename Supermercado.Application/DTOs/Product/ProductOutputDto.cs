@@ -12,5 +12,6 @@ public record ProductOutputDto(
     DateTime ExpirationDate,
     decimal ExpirationDiscountPercentage,
     bool IsAvailable,
-    decimal CurrentPrice
+    decimal CurrentPrice,
+    decimal DiscountedPrice
 );
