@@ -27,6 +27,9 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterUserDto dto)
     {
+        if (dto.Password != dto.ConfirmPassword)
+            return BadRequest(new { Message = "As senhas não conferem." });
+
         var user = new ApplicationUser { UserName = dto.Email, Email = dto.Email, FullName = dto.FullName };
         var result = await _userManager.CreateAsync(user, dto.Password);
 
@@ -86,5 +89,5 @@ public class AuthController : ControllerBase
     }
 }
 
-public record RegisterUserDto(string FullName, string Email, string Password);
+public record RegisterUserDto(string FullName, string Email, string Password, string ConfirmPassword);
 public record LoginUserDto(string Email, string Password);
