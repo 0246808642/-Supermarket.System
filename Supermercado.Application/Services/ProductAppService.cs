@@ -59,6 +59,66 @@ public class ProductAppService : IProductAppService
             throw new Exception("Houve um erro ao atualizar o preço do produto.");
     }
 
+    public async Task UpdateProductAsync(Guid id, UpdateProductInputDto input)
+    {
+        var product = await _productRepository.GetByIdAsync(id);
+        if (product is null) throw new Exception("Produto não encontrado.");
+
+        product.UpdateDetails(input.Name, input.Description, input.CategoryId);
+        _productRepository.Update(product);
+        if (!await _unitOfWork.CommitAsync()) throw new Exception("Erro ao atualizar o produto.");
+    }
+
+    public async Task ActivateProductAsync(Guid id)
+    {
+        var product = await _productRepository.GetByIdAsync(id);
+        if (product is null) throw new Exception("Produto não encontrado.");
+
+        product.Activate();
+        _productRepository.Update(product);
+        if (!await _unitOfWork.CommitAsync()) throw new Exception("Erro ao ativar o produto.");
+    }
+
+    public async Task DeactivateProductAsync(Guid id)
+    {
+        var product = await _productRepository.GetByIdAsync(id);
+        if (product is null) throw new Exception("Produto não encontrado.");
+
+        product.Deactivate();
+        _productRepository.Update(product);
+        if (!await _unitOfWork.CommitAsync()) throw new Exception("Erro ao desativar o produto.");
+    }
+
+    public async Task UpdateDiscountPercentageAsync(Guid id, UpdateDiscountPercentageInputDto input)
+    {
+        var product = await _productRepository.GetByIdAsync(id);
+        if (product is null) throw new Exception("Produto não encontrado.");
+
+        product.UpdateDiscountPercentage(input.Percentage);
+        _productRepository.Update(product);
+        if (!await _unitOfWork.CommitAsync()) throw new Exception("Erro ao atualizar o desconto do produto.");
+    }
+
+    public async Task AddStockAsync(Guid id, StockInputDto input)
+    {
+        var product = await _productRepository.GetByIdAsync(id);
+        if (product is null) throw new Exception("Produto não encontrado.");
+
+        product.AddStock(input.Quantity);
+        _productRepository.Update(product);
+        if (!await _unitOfWork.CommitAsync()) throw new Exception("Erro ao adicionar estoque.");
+    }
+
+    public async Task RemoveStockAsync(Guid id, StockInputDto input)
+    {
+        var product = await _productRepository.GetByIdAsync(id);
+        if (product is null) throw new Exception("Produto não encontrado.");
+
+        product.RemoveStock(input.Quantity, DateTime.UtcNow);
+        _productRepository.Update(product);
+        if (!await _unitOfWork.CommitAsync()) throw new Exception("Erro ao remover estoque.");
+    }
+
     public async Task<object?> GetProductByIdAsync(Guid id)
     {
         var product = await _productRepository.GetByIdAsync(id);
@@ -78,6 +138,19 @@ public class ProductAppService : IProductAppService
     public async Task<IEnumerable<object>> GetAllProductsAsync()
     {
         var products = await _productRepository.GetAllAsync();
+        var currentDate = DateTime.UtcNow;
+
+        return _currentUser.Role switch
+        {
+            Roles.Chefe => products.Select(p => MapToAuditDto(p, currentDate)),
+            Roles.Funcionario => products.Select(p => MapToDetailedDto(p, currentDate)),
+            _ => products.Select(p => MapToBaseDto(p, currentDate))
+        };
+    }
+
+    public async Task<IEnumerable<object>> GetExpiringProductsAsync(int days)
+    {
+        var products = await _productRepository.GetExpiringProductsAsync(days);
         var currentDate = DateTime.UtcNow;
 
         return _currentUser.Role switch

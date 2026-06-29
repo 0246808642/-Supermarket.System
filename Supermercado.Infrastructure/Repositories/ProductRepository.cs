@@ -30,6 +30,15 @@ public class ProductRepository : IProductRepository
         return await _context.Products.AsNoTracking().ToListAsync();
     }
 
+    public async Task<IEnumerable<Product>> GetExpiringProductsAsync(int days)
+    {
+        var targetDate = DateTime.UtcNow.AddDays(days);
+        return await _context.Products
+            .AsNoTracking()
+            .Where(p => !p.IsRemoved && p.ExpirationDate <= targetDate && p.ExpirationDate >= DateTime.UtcNow)
+            .ToListAsync();
+    }
+
     public void Add(Product product)
     {
         _context.Products.Add(product);

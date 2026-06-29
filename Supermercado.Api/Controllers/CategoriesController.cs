@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Supermercado.Application.DTOs.Category;
 using Supermercado.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Supermercado.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class CategoriesController : ControllerBase

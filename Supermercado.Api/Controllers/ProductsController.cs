@@ -79,4 +79,59 @@ public class ProductsController : ControllerBase
             return BadRequest(new { Message = ex.Message });
         }
     }
+
+    [HttpGet("expiring-soon")]
+    public async Task<IActionResult> GetExpiringSoon([FromQuery] int days = 10)
+    {
+        var products = await _productAppService.GetExpiringProductsAsync(days);
+        return Ok(products);
+    }
+
+    [HttpPut("{id:guid}")]
+    [Authorize(Roles = $"{Roles.Funcionario},{Roles.Chefe}")]
+    public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] UpdateProductInputDto input)
+    {
+        try { await _productAppService.UpdateProductAsync(id, input); return NoContent(); }
+        catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+    }
+
+    [HttpPatch("{id:guid}/activate")]
+    [Authorize(Roles = $"{Roles.Funcionario},{Roles.Chefe}")]
+    public async Task<IActionResult> Activate(Guid id)
+    {
+        try { await _productAppService.ActivateProductAsync(id); return NoContent(); }
+        catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+    }
+
+    [HttpPatch("{id:guid}/deactivate")]
+    [Authorize(Roles = $"{Roles.Funcionario},{Roles.Chefe}")]
+    public async Task<IActionResult> Deactivate(Guid id)
+    {
+        try { await _productAppService.DeactivateProductAsync(id); return NoContent(); }
+        catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+    }
+
+    [HttpPatch("{id:guid}/discount")]
+    [Authorize(Roles = $"{Roles.Funcionario},{Roles.Chefe}")]
+    public async Task<IActionResult> UpdateDiscount(Guid id, [FromBody] UpdateDiscountPercentageInputDto input)
+    {
+        try { await _productAppService.UpdateDiscountPercentageAsync(id, input); return NoContent(); }
+        catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+    }
+
+    [HttpPatch("{id:guid}/stock/add")]
+    [Authorize(Roles = $"{Roles.Funcionario},{Roles.Chefe}")]
+    public async Task<IActionResult> AddStock(Guid id, [FromBody] StockInputDto input)
+    {
+        try { await _productAppService.AddStockAsync(id, input); return NoContent(); }
+        catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+    }
+
+    [HttpPatch("{id:guid}/stock/remove")]
+    [Authorize(Roles = $"{Roles.Funcionario},{Roles.Chefe}")]
+    public async Task<IActionResult> RemoveStock(Guid id, [FromBody] StockInputDto input)
+    {
+        try { await _productAppService.RemoveStockAsync(id, input); return NoContent(); }
+        catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+    }
 }
