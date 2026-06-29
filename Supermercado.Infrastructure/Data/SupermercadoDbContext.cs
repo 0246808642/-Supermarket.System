@@ -15,6 +15,11 @@ public class SupermercadoDbContext : IdentityDbContext<ApplicationUser, Applicat
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Sale> Sales => Set<Sale>();
     public DbSet<SaleItem> SaleItems => Set<SaleItem>();
+    public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<StockMovement> StockMovements => Set<StockMovement>();
+    public DbSet<Address> Addresses => Set<Address>();
+    public DbSet<ShoppingCart> ShoppingCarts => Set<ShoppingCart>();
+    public DbSet<CartItem> CartItems => Set<CartItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

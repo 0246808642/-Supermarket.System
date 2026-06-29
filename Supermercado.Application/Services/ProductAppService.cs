@@ -2,6 +2,7 @@ using Supermercado.Application.Common;
 using Supermercado.Application.DTOs.Product;
 using Supermercado.Application.Interfaces;
 using Supermercado.Domain.Entities;
+using Supermercado.Domain.Enums;
 using Supermercado.Domain.Interfaces;
 using Supermercado.Domain.ValueObjects;
 
@@ -10,12 +11,14 @@ namespace Supermercado.Application.Services;
 public class ProductAppService : IProductAppService
 {
     private readonly IProductRepository _productRepository;
+    private readonly IStockMovementRepository _stockMovementRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUser;
 
-    public ProductAppService(IProductRepository productRepository, IUnitOfWork unitOfWork, ICurrentUserService currentUser)
+    public ProductAppService(IProductRepository productRepository, IStockMovementRepository stockMovementRepository, IUnitOfWork unitOfWork, ICurrentUserService currentUser)
     {
         _productRepository = productRepository;
+        _stockMovementRepository = stockMovementRepository;
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
     }
@@ -106,6 +109,10 @@ public class ProductAppService : IProductAppService
 
         product.AddStock(input.Quantity);
         _productRepository.Update(product);
+
+        var movement = new StockMovement(product.Id, input.Quantity, StockMovementType.Entrada, StockMovementReason.AjusteManual, _currentUser.UserId ?? Guid.Empty);
+        _stockMovementRepository.Add(movement);
+
         if (!await _unitOfWork.CommitAsync()) throw new Exception("Erro ao adicionar estoque.");
     }
 
@@ -116,6 +123,10 @@ public class ProductAppService : IProductAppService
 
         product.RemoveStock(input.Quantity, DateTime.UtcNow);
         _productRepository.Update(product);
+
+        var movement = new StockMovement(product.Id, input.Quantity, StockMovementType.Saida, StockMovementReason.AjusteManual, _currentUser.UserId ?? Guid.Empty);
+        _stockMovementRepository.Add(movement);
+
         if (!await _unitOfWork.CommitAsync()) throw new Exception("Erro ao remover estoque.");
     }
 

@@ -15,11 +15,16 @@ public static class NativeInjectorBootStrapper
         services.AddScoped<IProductAppService, ProductAppService>();
         services.AddScoped<ICategoryAppService, CategoryAppService>();
         services.AddScoped<ISaleAppService, SaleAppService>();
+        services.AddScoped<IAddressAppService, AddressAppService>();
+        services.AddScoped<IShoppingCartAppService, ShoppingCartAppService>();
 
         // Infrastructure Layer
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<ISaleRepository, SaleRepository>();
+        services.AddScoped<IStockMovementRepository, StockMovementRepository>();
+        services.AddScoped<IAddressRepository, AddressRepository>();
+        services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 }

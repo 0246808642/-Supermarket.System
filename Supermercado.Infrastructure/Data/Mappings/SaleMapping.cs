@@ -14,7 +14,10 @@ public class SaleMapping : IEntityTypeConfiguration<Sale>
             .IsRequired();
 
         builder.Property(s => s.CashierId)
-            .IsRequired();
+            .IsRequired(false);
+
+        builder.Property(s => s.CustomerId)
+            .IsRequired(false);
 
         builder.OwnsOne(s => s.TotalAmount, m =>
         {
