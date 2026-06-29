@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Supermercado.Application.DTOs.Category;
 using Supermercado.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Supermercado.Application.Common;
 
 namespace Supermercado.Api.Controllers;
 
@@ -18,6 +19,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAll()
     {
         var categories = await _categoryAppService.GetAllCategoriesAsync();
@@ -25,6 +27,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetById(Guid id)
     {
         var category = await _categoryAppService.GetCategoryByIdAsync(id);
@@ -35,6 +38,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = $"{Roles.Funcionario},{Roles.Chefe}")]
     public async Task<IActionResult> Register([FromBody] RegisterCategoryInputDto input)
     {
         try
@@ -49,6 +53,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpPatch("{id:guid}")]
+    [Authorize(Roles = $"{Roles.Funcionario},{Roles.Chefe}")]
     public async Task<IActionResult> UpdateCategory(Guid id, [FromBody] UpdateCategoryInputDto input)
     {
         try
