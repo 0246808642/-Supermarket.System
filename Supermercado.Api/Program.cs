@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using System.Text;
 using Supermercado.CrossCutting.IoC;
 using Supermercado.Application.Interfaces;
@@ -9,7 +10,6 @@ using Supermercado.Infrastructure.Services;
 using Supermercado.Infrastructure.Data;
 using Supermercado.Infrastructure.Identity;
 using Supermercado.Api.Services;
-using Supermercado.Application.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +23,23 @@ builder.Services.AddSwaggerGen(c =>
         var controller = apiDesc.ActionDescriptor.RouteValues["controller"];
         // Faz o AuthController aparecer no topo
         return controller == "Auth" ? $"0_{controller}" : $"1_{controller}";
+    });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "Insira o token JWT desta maneira: Bearer {seu_token}",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.OpenApiSecuritySchemeReference("Bearer", document, null),
+            new List<string>()
+        }
     });
 });
 builder.Services.AddControllers();

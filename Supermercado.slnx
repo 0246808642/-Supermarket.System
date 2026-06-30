@@ -4,4 +4,5 @@
   <Project Path="Supermercado.CrossCutting.IoC/Supermercado.CrossCutting.IoC.csproj" />
   <Project Path="Supermercado.Domain/Supermercado.Domain.csproj" />
   <Project Path="Supermercado.Infrastructure/Supermercado.Infrastructure.csproj" />
+  <Project Path="Supermercado.Web/Supermercado.Web.csproj" />
 </Solution>

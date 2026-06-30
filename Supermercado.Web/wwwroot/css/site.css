@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+html, body {
+    @apply bg-background text-on-surface font-sans;
+}
+
+/* Base custom styles based on the design system */
+.btn-primary {
+    @apply bg-primary text-on-primary px-4 py-2 rounded-lg font-semibold hover:bg-primary-container transition-colors;
+}
+
+.btn-secondary {
+    @apply border border-secondary text-secondary px-4 py-2 rounded-lg font-semibold hover:bg-secondary hover:text-on-secondary transition-colors;
+}
+
+.card {
+    @apply bg-surface-container-lowest rounded-lg shadow-sm p-4 border border-outline-variant/15;
+}
