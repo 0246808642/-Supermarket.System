@@ -28,4 +28,28 @@ app.MapStaticAssets();
 app.MapRazorPages()
    .WithStaticAssets();
 
+app.MapGet("/api/search", async (string? q, IHttpClientFactory clientFactory) => 
+{
+    if (string.IsNullOrWhiteSpace(q)) return Results.Ok(new List<object>());
+
+    var client = clientFactory.CreateClient("SupermercadoApi");
+    var response = await client.GetAsync("/api/Products");
+    
+    if (response.IsSuccessStatusCode)
+    {
+        var content = await response.Content.ReadAsStringAsync();
+        var allProducts = System.Text.Json.JsonSerializer.Deserialize<List<Supermercado.Web.Pages.ProductViewModel>>(content, new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
+        
+        var filtered = allProducts
+            .Where(p => p.Name.Contains(q, StringComparison.OrdinalIgnoreCase))
+            .Take(5)
+            .Select(p => new { p.Id, p.Name, p.ImageUrl, p.Price, p.DiscountedPrice })
+            .ToList();
+            
+        return Results.Ok(filtered);
+    }
+    
+    return Results.Ok(new List<object>());
+});
+
 app.Run();
