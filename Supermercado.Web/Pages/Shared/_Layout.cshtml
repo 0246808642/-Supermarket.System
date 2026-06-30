@@ -106,30 +106,70 @@
                             </button>
                         </div>
                         
-                        <form action="#" method="POST" class="flex flex-col gap-4">
-                            <div>
-                                <label for="email" class="block text-sm font-medium text-on-surface-variant mb-1">E-mail</label>
-                                <input type="email" name="email" id="email" class="block w-full rounded-md border-0 py-2 text-on-surface shadow-sm ring-1 ring-inset ring-outline-variant focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 px-3 bg-surface-container-low" placeholder="seu@email.com">
-                            </div>
-                            <div>
-                                <label for="password" class="block text-sm font-medium text-on-surface-variant mb-1">Senha</label>
-                                <input type="password" name="password" id="password" class="block w-full rounded-md border-0 py-2 text-on-surface shadow-sm ring-1 ring-inset ring-outline-variant focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 px-3 bg-surface-container-low" placeholder="••••••••">
-                            </div>
-                            <div class="flex items-center justify-between mt-2">
-                                <div class="flex items-center">
-                                    <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 rounded border-outline-variant text-primary focus:ring-primary bg-surface-container-low">
-                                    <label for="remember-me" class="ml-2 block text-sm text-on-surface-variant">Lembrar-me</label>
+                        <!-- FORM DE LOGIN -->
+                        <div id="form-login">
+                            <form action="#" method="POST" class="flex flex-col gap-4">
+                                <div>
+                                    <label for="email" class="block text-sm font-medium text-on-surface-variant mb-1">E-mail</label>
+                                    <input type="email" name="email" id="email" class="block w-full rounded-md border-0 py-2 text-on-surface shadow-sm ring-1 ring-inset ring-outline-variant focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 px-3 bg-surface-container-low" placeholder="seu@email.com">
                                 </div>
-                                <div class="text-sm">
-                                    <a href="#" class="font-semibold text-primary hover:text-primary-container transition-colors">Esqueceu a senha?</a>
+                                <div>
+                                    <label for="password" class="block text-sm font-medium text-on-surface-variant mb-1">Senha</label>
+                                    <input type="password" name="password" id="password" class="block w-full rounded-md border-0 py-2 text-on-surface shadow-sm ring-1 ring-inset ring-outline-variant focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 px-3 bg-surface-container-low" placeholder="••••••••">
                                 </div>
+                                <div class="flex items-center justify-between mt-2">
+                                    <div class="flex items-center">
+                                        <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 rounded border-outline-variant text-primary focus:ring-primary bg-surface-container-low">
+                                        <label for="remember-me" class="ml-2 block text-sm text-on-surface-variant">Lembrar-me</label>
+                                    </div>
+                                    <div class="text-sm">
+                                        <a href="javascript:void(0)" onclick="toggleModalView('form-forgot', 'Recuperar Senha')" class="font-semibold text-primary hover:text-primary-container transition-colors">Esqueceu a senha?</a>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-primary w-full mt-2 py-2 text-center justify-center">Entrar</button>
+                            </form>
+                            <div class="mt-6 text-center text-sm text-on-surface-variant">
+                                Ainda não tem conta? <a href="javascript:void(0)" onclick="toggleModalView('form-register', 'Criar Conta')" class="font-semibold text-primary hover:text-primary-container transition-colors">Cadastre-se</a>
                             </div>
-                            <button type="button" class="btn-primary w-full mt-2 py-2 text-center justify-center">Entrar</button>
-                        </form>
-
-                        <div class="mt-6 text-center text-sm text-on-surface-variant">
-                            Ainda não tem conta? <a href="#" class="font-semibold text-primary hover:text-primary-container transition-colors">Cadastre-se</a>
                         </div>
+
+                        <!-- FORM DE REGISTRO -->
+                        <div id="form-register" class="hidden">
+                            <form action="#" method="POST" class="flex flex-col gap-4">
+                                <div>
+                                    <label for="reg-name" class="block text-sm font-medium text-on-surface-variant mb-1">Nome Completo</label>
+                                    <input type="text" name="reg-name" id="reg-name" class="block w-full rounded-md border-0 py-2 text-on-surface shadow-sm ring-1 ring-inset ring-outline-variant focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 px-3 bg-surface-container-low" placeholder="João da Silva">
+                                </div>
+                                <div>
+                                    <label for="reg-email" class="block text-sm font-medium text-on-surface-variant mb-1">E-mail</label>
+                                    <input type="email" name="reg-email" id="reg-email" class="block w-full rounded-md border-0 py-2 text-on-surface shadow-sm ring-1 ring-inset ring-outline-variant focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 px-3 bg-surface-container-low" placeholder="seu@email.com">
+                                </div>
+                                <div>
+                                    <label for="reg-password" class="block text-sm font-medium text-on-surface-variant mb-1">Senha</label>
+                                    <input type="password" name="reg-password" id="reg-password" class="block w-full rounded-md border-0 py-2 text-on-surface shadow-sm ring-1 ring-inset ring-outline-variant focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 px-3 bg-surface-container-low" placeholder="••••••••">
+                                </div>
+                                <button type="button" class="btn-primary w-full mt-2 py-2 text-center justify-center">Criar Conta</button>
+                            </form>
+                            <div class="mt-6 text-center text-sm text-on-surface-variant">
+                                Já tem uma conta? <a href="javascript:void(0)" onclick="toggleModalView('form-login', 'Acessar Conta')" class="font-semibold text-primary hover:text-primary-container transition-colors">Faça login</a>
+                            </div>
+                        </div>
+
+                        <!-- FORM DE RECUPERAR SENHA -->
+                        <div id="form-forgot" class="hidden">
+                            <p class="text-sm text-on-surface-variant mb-4">Informe seu e-mail cadastrado e enviaremos instruções para redefinir sua senha.</p>
+                            <form action="#" method="POST" class="flex flex-col gap-4">
+                                <div>
+                                    <label for="forgot-email" class="block text-sm font-medium text-on-surface-variant mb-1">E-mail</label>
+                                    <input type="email" name="forgot-email" id="forgot-email" class="block w-full rounded-md border-0 py-2 text-on-surface shadow-sm ring-1 ring-inset ring-outline-variant focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 px-3 bg-surface-container-low" placeholder="seu@email.com">
+                                </div>
+                                <button type="button" class="btn-primary w-full mt-2 py-2 text-center justify-center">Enviar Instruções</button>
+                            </form>
+                            <div class="mt-6 text-center text-sm text-on-surface-variant">
+                                Lembrou da senha? <a href="javascript:void(0)" onclick="toggleModalView('form-login', 'Acessar Conta')" class="font-semibold text-primary hover:text-primary-container transition-colors">Voltar para o login</a>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -139,9 +179,20 @@
     <script>
         function openLoginModal() {
             document.getElementById('login-modal').classList.remove('hidden');
+            toggleModalView('form-login', 'Acessar Conta');
         }
+        
         function closeLoginModal() {
             document.getElementById('login-modal').classList.add('hidden');
+        }
+
+        function toggleModalView(viewId, title) {
+            document.getElementById('form-login').classList.add('hidden');
+            document.getElementById('form-register').classList.add('hidden');
+            document.getElementById('form-forgot').classList.add('hidden');
+            
+            document.getElementById(viewId).classList.remove('hidden');
+            document.getElementById('modal-title').innerText = title;
         }
 
         // Live Search Autocomplete
